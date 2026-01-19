@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="MONOPOLY.Client.ui.MainController">
+
+    <!-- LOG -->
+    <right>
+        <VBox spacing="10" prefWidth="250" style="-fx-padding: 10; -fx-background-color: #ecf0f1;">
+            <Label text="STATO GIOCATORI" style="-fx-font-weight: bold;"/>
+            <ListView fx:id="playerListView" prefHeight="200"/>
+
+            <Label text="DIARIO DI GIOCO" style="-fx-font-weight: bold;"/>
+            <TextArea fx:id="logArea" VBox.vgrow="ALWAYS" editable="false" wrapText="true"/>
+        </VBox>
+    </right>
+
+    <!-- BOARD -->
+    <center>
+        <GridPane fx:id="board"
+                  gridLinesVisible="true"
+                  prefWidth="600"
+                  prefHeight="600"/>
+    </center>
+
+    <!-- CONTROLS -->
+    <bottom>
+        <VBox spacing="5" style="-fx-padding: 10;">
+            <Button fx:id="startButton"
+                    text="OYUNU BAŞLAT"
+                    onAction="#startGame"
+                    visible="false"
+                    managed="false"
+                    maxWidth="Infinity"
+                    prefHeight="40"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+            <Button fx:id="rollDiceButton"
+                    text="Zar At"
+                    onAction="#rollDice"
+                    disable="true"
+                    maxWidth="Infinity"
+                    prefHeight="40"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>
