@@ -30,16 +30,16 @@
     <bottom>
         <VBox spacing="5" style="-fx-padding: 10;">
             <HBox spacing="10" alignment="CENTER">
-                <Button fx:id="rollDiceButton" text="Lancia i dadi" onAction="#rollDice" disable="true" prefHeight="40"/>
+                <Button fx:id="rollDiceButton" text="LANCIA I DADI" onAction="#rollDice" disable="true" prefHeight="40"/>
 
                 <HBox fx:id="decisionBox" spacing="10" visible="false" managed="false">
-                    <Button text="Compra" onAction="#handleBuy" style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
-                    <Button text="Passa" onAction="#handleSkip" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                    <Button text="COMPRA" onAction="#handleBuy" style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+                    <Button text="PASSA" onAction="#handleSkip" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
                 </HBox>
             </HBox>
 
             <Button fx:id="startButton"
-                    text="Start Game"
+                    text="AVVIA PARTITA"
                     onAction="#startGame"
                     visible="false"
                     managed="false"

@@ -43,7 +43,7 @@ public class ClientHandler implements Runnable {
                 switch (msg.getType()) {
                     case JOIN_GAME:
                         if (state.isGameStarted()) {
-                            sendMessage(new Message(MessageType.ERROR, "Oyun zaten başladı!"));
+                            sendMessage(new Message(MessageType.ERROR, "La partita è già iniziata! Impossibile unirsi."));
                             return;
                         }
                         String pName = (String) msg.getPayload();
@@ -56,13 +56,13 @@ public class ClientHandler implements Runnable {
                         } else {
                             sendMessage(new Message(MessageType.JOIN_GAME, "GUEST"));
                         }
-                        broadcastUpdate(-1, pName + " oyuna katıldı!");
+                        broadcastUpdate(-1, pName + " si è unito alla partita!");
                         break;
 
                     case START_GAME:
                         if (player == state.getOwner()) {
                             state.startGame();
-                            broadcast(new Message(MessageType.START_GAME, "Oyun Başladı!"));
+                            broadcast(new Message(MessageType.START_GAME, "La partita è iniziata!"));
                             sendTurnNotification();
                         }
                         break;
@@ -83,14 +83,13 @@ public class ClientHandler implements Runnable {
                 }
             }
         } catch (EOFException | java.net.SocketException e) {
-            System.out.println("Oyuncu ayrıldı: " + (player != null ? player.getName() : "Bilinmiyor"));
+            System.out.println("Giocatore disconnesso: " + (player != null ? player.getName() : "Sconosciuto"));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             closeConnection();
         }
     }
-
 
     private void processDiceRoll() {
         int dice = new java.util.Random().nextInt(6) + 1;
@@ -100,21 +99,21 @@ public class ClientHandler implements Runnable {
 
         if (tile instanceof PropertyTile pt) {
             if (pt.getOwner() == null) {
-                broadcastUpdate(newPos, player.getName() + " attı: " + dice + ". Satın alabilir.");
+                broadcastUpdate(newPos, player.getName() + " ha tirato " + dice + ". Può acquistare " + pt.getName());
                 sendMessage(new Message(MessageType.PROMPT_PURCHASE, pt.getName() + ":" + pt.getPrice()));
             } else if (pt.getOwner() != player) {
-                // Kira öde
                 String rentResult = pt.onLand(player);
-                broadcastUpdate(newPos, player.getName() + " attı: " + dice + ". " + rentResult);
+                broadcastUpdate(newPos, player.getName() + " ha tirato " + dice + ". Ha pagato l'affitto a " + pt.getOwner().getName());
                 state.nextTurn();
                 sendTurnNotification();
             } else {
-                broadcastUpdate(newPos, player.getName() + " attı: " + dice + ". Kendi mülkü.");
+                // Kendi mülkü
+                broadcastUpdate(newPos, player.getName() + " ha tirato " + dice + ". È sulla sua proprietà.");
                 state.nextTurn();
                 sendTurnNotification();
             }
         } else {
-            broadcastUpdate(newPos, player.getName() + " attı: " + dice);
+            broadcastUpdate(newPos, player.getName() + " ha tirato " + dice);
             state.nextTurn();
             sendTurnNotification();
         }
@@ -126,26 +125,23 @@ public class ClientHandler implements Runnable {
             if (player.getMoney() >= pt.getPrice()) {
                 pt.setOwner(player);
                 player.removeMoney(pt.getPrice());
-                broadcastUpdate(player.getPosition(), player.getName() + " satın aldı: " + pt.getName());
+                broadcastUpdate(player.getPosition(), player.getName() + " ha acquistato " + pt.getName() + "!");
             } else {
-                sendMessage(new Message(MessageType.ERROR, "Yetersiz Bakiye!"));
+                sendMessage(new Message(MessageType.ERROR, "Fondi insufficienti!"));
             }
         } else {
-            broadcastUpdate(player.getPosition(), player.getName() + " satın almadı.");
+            broadcastUpdate(player.getPosition(), player.getName() + " ha deciso di non acquistare.");
         }
         state.nextTurn();
         sendTurnNotification();
     }
-
 
     private void sendMessage(Message msg) {
         try {
             out.writeObject(msg);
             out.reset();
             out.flush();
-        } catch (IOException e) {
-            System.out.println("Mesaj gönderme hatası: " + e.getMessage());
-        }
+        } catch (IOException e) {}
     }
 
     private void broadcast(Message msg) {
@@ -175,8 +171,6 @@ public class ClientHandler implements Runnable {
                 ownerIdx = state.getPlayers().indexOf(pt.getOwner());
             }
         }
-
-        // pIdx:pos:money:ownerIdx:message
         String payload = pIdx + ":" + pos + ":" + money + ":" + ownerIdx + ":" + logMessage;
         broadcast(new Message(MessageType.GAME_STATE_UPDATE, payload));
     }
@@ -192,9 +186,7 @@ public class ClientHandler implements Runnable {
     }
 
     private void closeConnection() {
-        synchronized (clients) {
-            clients.remove(this);
-        }
+        synchronized (clients) { clients.remove(this); }
         try { if (socket != null) socket.close(); } catch (IOException e) {}
     }
 }

@@ -12,7 +12,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.geometry.Pos;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +31,11 @@ public class MainController {
     private boolean isOwner = false;
 
     public static class PlayerInfo {
-        int id;
-        String name;
-        int money;
+        int id; String name; int money;
         public PlayerInfo(int id, String name, int money) {
             this.id = id; this.name = name; this.money = money;
         }
-        @Override public String toString() { return name + ": " + money + " $"; }
+        @Override public String toString() { return name + ": " + money + " €"; }
     }
 
     @FXML
@@ -51,23 +48,20 @@ public class MainController {
             protected void updateItem(PlayerInfo item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
+                    setText(null); setGraphic(null);
                 } else {
                     setText(item.toString());
                     setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
-
                     Circle c = new Circle(8);
                     Color[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
                     if (item.id >= 0 && item.id < colors.length) c.setFill(colors[item.id]);
                     else c.setFill(Color.GREY);
-
                     setGraphic(c);
                 }
             }
         });
 
-        log("Hoşgeldiniz! Bağlantı bekleniyor...");
+        log("Benvenuto! In attesa di connessione..."); // Hoşgeldiniz
         startButton.setVisible(false);
         startButton.setManaged(false);
         rollDiceButton.setDisable(true);
@@ -76,25 +70,25 @@ public class MainController {
 
     public void setNetworkClient(NetworkClient networkClient) {
         this.networkClient = networkClient;
-        networkClient.send(new Message(MessageType.JOIN_GAME, "Player " + (int)(Math.random()*1000)));
+        networkClient.send(new Message(MessageType.JOIN_GAME, "Giocatore " + (int)(Math.random()*100)));
     }
 
     public void handleJoinResponse(String role) {
         if ("OWNER".equals(role)) {
             this.isOwner = true;
-            log("Odayı kurdunuz. Oyuncular bekleniyor...");
+            log("Hai creato la stanza. In attesa di altri giocatori...");
             Platform.runLater(() -> {
                 startButton.setVisible(true);
                 startButton.setManaged(true);
             });
         } else {
-            log("Odaya katıldınız. Kurucunun başlatması bekleniyor.");
+            log("Ti sei unito alla partita. In attesa che l'Host inizi...");
         }
     }
 
     @FXML
     private void startGame() {
-        log("Game Starting...");
+        log("Avvio della partita in corso...");
         networkClient.send(new Message(MessageType.START_GAME, null));
     }
 
@@ -102,7 +96,7 @@ public class MainController {
         Platform.runLater(() -> {
             startButton.setVisible(false);
             startButton.setManaged(false);
-            log("OYUN BAŞLADI!");
+            log("PARTITA INIZIATA! BUONA FORTUNA!");
         });
     }
 
@@ -112,7 +106,11 @@ public class MainController {
 
     public void showPurchaseDecision(String info) {
         Platform.runLater(() -> {
-            log("Satın almak ister misin? " + info);
+            // info format: Name:Price
+            String[] parts = info.split(":");
+            String msg = (parts.length > 1) ? parts[0] + " per " + parts[1] + " €" : info;
+
+            log("Vuoi acquistare " + msg + "?");
             rollDiceButton.setVisible(false);
             rollDiceButton.setManaged(false);
             if(decisionBox != null) { decisionBox.setVisible(true); decisionBox.setManaged(true); }
@@ -124,21 +122,20 @@ public class MainController {
             if(decisionBox != null) { decisionBox.setVisible(false); decisionBox.setManaged(false); }
             rollDiceButton.setVisible(true);
             rollDiceButton.setManaged(true);
-            rollDiceButton.setDisable(true); // Karar verince sıra biter
+            rollDiceButton.setDisable(true);
         });
     }
 
     public void setMyTurn(boolean myTurn) {
         Platform.runLater(() -> {
             rollDiceButton.setDisable(!myTurn);
-            if (myTurn) log(">>> SENİN SIRAN <<<");
+            if (myTurn) log(">>> È IL TUO TURNO <<<");
         });
     }
 
     public void updateGameState(Object payload) {
         if (payload instanceof String content) {
             try {
-                // pIdx:pos:money:ownerIdx:message
                 String[] parts = content.split(":", 5);
                 if (parts.length == 5) {
                     int pIdx = Integer.parseInt(parts[0]);
@@ -149,7 +146,7 @@ public class MainController {
 
                     log(message);
 
-                    if (pIdx != -1) updatePlayerList(pIdx, "Player " + pIdx, money);
+                    if (pIdx != -1) updatePlayerList(pIdx, "Giocatore " + pIdx, money);
 
                     Platform.runLater(() -> {
                         if (pIdx != -1 && newPos != -1) {
@@ -166,7 +163,7 @@ public class MainController {
                     log(content);
                 }
             } catch (Exception e) {
-                log("Hata: " + content);
+                log("Errore: " + content);
             }
         }
     }
