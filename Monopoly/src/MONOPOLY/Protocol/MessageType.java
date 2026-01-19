@@ -1,6 +1,9 @@
 package MONOPOLY.Protocol;
 
 public enum MessageType {
+    PROMPT_PURCHASE,
+    BUY_PROPERTY,
+    SKIP_PROPERTY,
     SET_PLAYER_COUNT,
     JOIN_GAME,
     START_GAME,

@@ -26,6 +26,7 @@
     </center>
 
     <!-- CONTROLS -->
+    <!--
     <bottom>
         <VBox spacing="5" style="-fx-padding: 10;">
             <Button fx:id="startButton"
@@ -45,5 +46,19 @@
                     prefHeight="40"/>
         </VBox>
     </bottom>
+    -->
+    <bottom>
+        <VBox spacing="5" style="-fx-padding: 10;">
+            <HBox spacing="10" alignment="CENTER">
+                <Button fx:id="rollDiceButton" text="Lancia i dadi" onAction="#rollDice" disable="true" prefHeight="40"/>
 
+                <HBox fx:id="decisionBox" spacing="10" visible="false" managed="false">
+                    <Button text="Compra" onAction="#handleBuy" style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+                    <Button text="Passa" onAction="#handleSkip" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                </HBox>
+            </HBox>
+
+            <Button fx:id="startButton" text="OYUNU BAŞLAT" onAction="#startGame" visible="false" managed="false" maxWidth="Infinity"/>
+        </VBox>
+    </bottom>
 </BorderPane>

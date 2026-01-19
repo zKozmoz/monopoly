@@ -34,4 +34,6 @@ public class PropertyTile extends Tile {
     public Player getOwner() {
         return owner;
     }
+    public int getPrice() { return price; }
+    public void setOwner(Player owner) { this.owner = owner; }
 }

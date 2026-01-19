@@ -21,6 +21,8 @@ public class MainController {
 
     @FXML private GridPane board;
     @FXML private TextArea logArea;
+    @FXML private HBox decisionBox;
+    @FXML private Button rollDiceButton;
 
     private final Map<Integer, StackPane> tileMap = new HashMap<>();
     private final Circle[] playerTokens = new Circle[4];
@@ -35,8 +37,6 @@ public class MainController {
 
     @FXML
     private Button startButton;
-    @FXML
-    private Button rollDiceButton;
     private boolean isOwner = false;
     private boolean gameStarted = false;
 
@@ -84,11 +84,9 @@ public class MainController {
     }
 
     public void updatePlayerStatus(int pIdx, String name, int money) {
+        playerInfoMap.put(pIdx, name + ": " + money + " $");
         Platform.runLater(() -> {
-            playerInfoMap.put(pIdx, name + ": " + money + "$");
-
-            playerListView.getItems().clear();
-            playerListView.getItems().addAll(playerInfoMap.values());
+            playerListView.getItems().setAll(playerInfoMap.values());
         });
     }
 
@@ -156,9 +154,7 @@ public class MainController {
     public void updateGameState(Object payload) {
         if (payload instanceof String content) {
             try {
-                // Nuovo format: "INDEX:POSITION:MONEY:OWNER_INDEX:MESSAGE"
                 String[] parts = content.split(":", 5);
-
                 if (parts.length == 5) {
                     int pIdx = Integer.parseInt(parts[0]);
                     int newPos = Integer.parseInt(parts[1]);
@@ -167,31 +163,33 @@ public class MainController {
                     String message = parts[4];
 
                     log(message);
-                    updatePlayerStatus(pIdx, "Player " + pIdx, money);
-
                     Platform.runLater(() -> {
                         Circle token = playerTokens[pIdx];
                         tileMap.values().forEach(pane -> pane.getChildren().remove(token));
-                        if (tileMap.containsKey(newPos)) {
-                            tileMap.get(newPos).getChildren().add(token);
-                        }
+                        tileMap.get(newPos).getChildren().add(token);
+
+                        updatePlayerStatus(pIdx, "Giocatore " + (pIdx + 1), money);
 
                         if (ownerIdx != -1) {
                             updateTileColor(newPos, ownerIdx);
                         }
                     });
+                    setMyTurn(false);
                 }
             } catch (Exception e) {
-                log("Veri ayrıştırma hatası: " + content);
+                log("Veri hatası: " + content);
             }
         }
     }
+
     private void updateTileColor(int tileIndex, int ownerIdx) {
         Color[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
         StackPane tile = tileMap.get(tileIndex);
-
-        String hexColor = toHexString(playerColors[ownerIdx]);
-        tile.setStyle("-fx-border-color: #333; -fx-background-color: " + hexColor + "; -fx-opacity: 0.8;");
+        String hex = String.format("#%02X%02X%02X",
+                (int)(playerColors[ownerIdx].getRed() * 255),
+                (int)(playerColors[ownerIdx].getGreen() * 255),
+                (int)(playerColors[ownerIdx].getBlue() * 255));
+        tile.setStyle("-fx-border-color: #333; -fx-background-color: " + hex + ";");
     }
 
     private String toHexString(Color color) {
@@ -199,5 +197,35 @@ public class MainController {
                 (int)(color.getRed() * 255),
                 (int)(color.getGreen() * 255),
                 (int)(color.getBlue() * 255));
+    }
+
+    public void showPurchaseDecision(String propertyInfo) {
+        Platform.runLater(() -> {
+            log("Vuoi comprare " + propertyInfo.replace(":", " per ") + "$?");
+            rollDiceButton.setVisible(false);
+            decisionBox.setVisible(true);
+            decisionBox.setManaged(true);
+        });
+    }
+
+    @FXML
+    private void handleBuy() {
+        networkClient.send(new Message(MessageType.BUY_PROPERTY, null));
+        resetButtons();
+    }
+
+    @FXML
+    private void handleSkip() {
+        networkClient.send(new Message(MessageType.SKIP_PROPERTY, null));
+        resetButtons();
+    }
+
+    private void resetButtons() {
+        Platform.runLater(() -> {
+            decisionBox.setVisible(false);
+            decisionBox.setManaged(false);
+            rollDiceButton.setVisible(true);
+            rollDiceButton.setDisable(true);
+        });
     }
 }

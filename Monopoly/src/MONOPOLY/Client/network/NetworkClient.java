@@ -72,6 +72,9 @@ public class NetworkClient {
                 case ERROR ->
                         controller.log("Error: " + msg.getPayload());
 
+                case PROMPT_PURCHASE ->
+                        controller.showPurchaseDecision(msg.getPayload().toString());
+
                 default ->
                         controller.log("Unhandled message: " + msg.getType());
             }
