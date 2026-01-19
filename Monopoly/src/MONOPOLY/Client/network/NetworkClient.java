@@ -52,8 +52,10 @@ public class NetworkClient {
         Platform.runLater(() -> {
             switch (msg.getType()) {
 
-                case JOIN_GAME ->
-                        controller.handleJoinResponse(msg.getPayload().toString());
+                case JOIN_GAME -> {
+                    String role = msg.getPayload().toString();
+                    controller.handleJoinResponse(role);
+                }
 
                 case START_GAME ->
                         controller.onGameStarted();

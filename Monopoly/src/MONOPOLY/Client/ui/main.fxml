@@ -8,12 +8,14 @@
 
     <!-- LOG -->
     <right>
-        <VBox spacing="10" prefWidth="250" style="-fx-padding: 10; -fx-background-color: #ecf0f1;">
-            <Label text="STATO GIOCATORI" style="-fx-font-weight: bold;"/>
-            <ListView fx:id="playerListView" prefHeight="200"/>
+        <VBox spacing="10" prefWidth="280" style="-fx-padding: 10; -fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-width: 0 0 0 2;">
 
-            <Label text="DIARIO DI GIOCO" style="-fx-font-weight: bold;"/>
-            <TextArea fx:id="logArea" VBox.vgrow="ALWAYS" editable="false" wrapText="true"/>
+            <Label text="STATO GIOCATORI" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
+
+            <ListView fx:id="playerListView" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;"/>
+
+            <Label text="DIARIO DI GIOCO" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
+            <TextArea fx:id="logArea" prefHeight="200" editable="false" wrapText="true" style="-fx-focus-color: transparent; -fx-text-box-border: transparent;"/>
         </VBox>
     </right>
 
@@ -25,28 +27,6 @@
                   prefHeight="600"/>
     </center>
 
-    <!-- CONTROLS -->
-    <!--
-    <bottom>
-        <VBox spacing="5" style="-fx-padding: 10;">
-            <Button fx:id="startButton"
-                    text="OYUNU BAŞLAT"
-                    onAction="#startGame"
-                    visible="false"
-                    managed="false"
-                    maxWidth="Infinity"
-                    prefHeight="40"
-                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
-
-            <Button fx:id="rollDiceButton"
-                    text="Zar At"
-                    onAction="#rollDice"
-                    disable="true"
-                    maxWidth="Infinity"
-                    prefHeight="40"/>
-        </VBox>
-    </bottom>
-    -->
     <bottom>
         <VBox spacing="5" style="-fx-padding: 10;">
             <HBox spacing="10" alignment="CENTER">
@@ -58,7 +38,14 @@
                 </HBox>
             </HBox>
 
-            <Button fx:id="startButton" text="OYUNU BAŞLAT" onAction="#startGame" visible="false" managed="false" maxWidth="Infinity"/>
+            <Button fx:id="startButton"
+                    text="Start Game"
+                    onAction="#startGame"
+                    visible="false"
+                    managed="false"
+                    maxWidth="Infinity"
+                    prefHeight="40"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
         </VBox>
     </bottom>
 </BorderPane>
